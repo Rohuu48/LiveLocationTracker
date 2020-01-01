@@ -10,9 +10,11 @@ import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { Provider as AuthProvider } from "./src/context/AuthContext";
+import { Provider as LocationProvider } from "./src/context/LocationContext";
+import { Provider as TrackProvider } from "./src/context/TrackContext";
 import { setNavigator } from "./src/navigationRef";
 import ResolveAuthScreen from "./src/screens/ResolveAuthScreen";
-
+import { FontAwesome } from "@expo/vector-icons";
 const switchNavigator = createSwitchNavigator(
   {
     ResolveAuthScreen: ResolveAuthScreen,
@@ -32,10 +34,26 @@ const switchNavigator = createSwitchNavigator(
     }),
     mainFlow: createBottomTabNavigator({
       trackListFlow: createStackNavigator({
-        TrackList: TrackList,
+        TrackList: {
+          screen: TrackList,
+          navigationOptions: () => ({
+            headerTitle: "Tracks",
+            headerTitleStyle: {
+              marginLeft: 150,
+              fontWeight: "bold",
+              fontSize: 16
+            }
+          })
+        },
         TrackDetails: TrackDetails
       }),
-      TrackCreate: TrackCreate,
+
+      TrackCreate: {
+        screen: TrackCreate,
+        navigationOptions: () => ({
+          tabBarIcon: <FontAwesome name="plus" size={20} />
+        })
+      },
       Account: Account
     })
   },
@@ -49,12 +67,16 @@ const App = createAppContainer(switchNavigator);
 
 export default () => {
   return (
-    <AuthProvider>
-      <App
-        ref={navigator => {
-          setNavigator(navigator);
-        }}
-      />
-    </AuthProvider>
+    <TrackProvider>
+      <LocationProvider>
+        <AuthProvider>
+          <App
+            ref={navigator => {
+              setNavigator(navigator);
+            }}
+          />
+        </AuthProvider>
+      </LocationProvider>
+    </TrackProvider>
   );
 };
